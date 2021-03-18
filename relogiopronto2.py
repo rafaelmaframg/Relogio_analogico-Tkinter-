@@ -3,21 +3,18 @@ from math import cos,radians,sin
 import time
 
 class RelogioAnalogio(tk.Canvas):
-
-    def __init__(self,frame):
-        tk.Canvas.__init__(self, master=frame)
-        self.watch = tk.Canvas(frame, width=500, height=500, bg='black')
-        self.watch.pack()
+    def __init__(self, master=None, **kwargs):
+        tk.Canvas.__init__(self, master, **kwargs, width=500, height=500, bg='black')
         self.atualiza()
 
     def desenha_ponteiro_horas(self,horas):
-        self.watch.create_line((250,250,250+50*sin(radians(horas)),250-50*cos(radians(horas))),fill="green", width=4)
+        self.create_line((250,250,250+50*sin(radians(horas)),250-50*cos(radians(horas))),fill="green", width=4)
 
     def desenha_ponteiro_minuto(self,minutos):
-        self.watch.create_line((250, 250, 250 + 80 * sin(radians(minutos)), 250 - 80 * cos(radians(minutos))), fill="darkblue", width=2)
+        self.create_line((250, 250, 250 + 80 * sin(radians(minutos)), 250 - 80 * cos(radians(minutos))), fill="darkblue", width=2)
 
     def desenha_ponteiro_segundos(self,segundos):
-        self.watch.create_line((250, 250, 250 + 100 * sin(radians(segundos)), 250 - 100 * cos(radians(segundos))),
+        self.create_line((250, 250, 250 + 100 * sin(radians(segundos)), 250 - 100 * cos(radians(segundos))),
                                  fill="red", width=1)
     def time(self):
 
@@ -38,17 +35,17 @@ class RelogioAnalogio(tk.Canvas):
         self.desenha_ponteiro_horas(hora)
         self.desenha_ponteiro_minuto(minuto)
         self.desenha_ponteiro_segundos(segundo)
-        self.watch.after(100, self.atualiza)
+        self.after(100, self.atualiza)
 
     def marcador30(self,x,y):
-        self.watch.create_line(x[0],x[1],y[0],y[1],fill="red",width=3)
+        self.create_line(x[0],x[1],y[0],y[1],fill="red",width=3)
 
     def marcador6(self, x, y):
-        self.watch.create_line(x[0], x[1], y[0], y[1], fill="red", width=3)
+        self.create_line(x[0], x[1], y[0], y[1], fill="red", width=3)
 
     def printa_marcador(self):
-        self.watch.create_oval(100, 100, int(self.watch['width']) - 100,
-                                 int(self.watch['height']) - 100, width=2,
+        self.create_oval(100, 100, int(self['width']) - 100,
+                                 int(self['height']) - 100, width=2,
                                  outline='white', fill='white')
         for i in range(0, 360, 30):
             self.marcadores(radians(i - 90), 120, 30, self.marcador30)
@@ -60,6 +57,9 @@ class RelogioAnalogio(tk.Canvas):
         self.chama_desenho()
 
 
-relogio = tk.Tk()
-analogico = RelogioAnalogio(relogio)
-relogio.mainloop()
+
+if __name__ == '__main__':
+    relogio = tk.Tk()
+    analogico = RelogioAnalogio(relogio)
+    analogico.pack()
+    relogio.mainloop()
