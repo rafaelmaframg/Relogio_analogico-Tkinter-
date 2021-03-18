@@ -1,58 +1,54 @@
-from datetime import datetime
-from math import sin, cos, pi
-from tkinter import *
+import tkinter
+import datetime
+import math
 
 
-class relogioAnalogico(Canvas):
-    def __init__(self, root):
-        Canvas.__init__(self, master=root)
-        self.root = root
-        self.canvas = Canvas(self.root, width=400, height=400, background="#000000")
-        self.canvas.create_oval(10, 10, 390, 390, outline="white", width=2)
-        self.canvas.pack()
+class relogioAnalogico(tkinter.Canvas):
+
+    def __init__(self, master=None, **kwargs):
+        tkinter.Canvas.__init__(self, master, **kwargs, width=250, height=250)
+        self.hr = None
+        self.min = None
+        self.seg = None
+        self.angulo = 0
+        for i in range(13):
+            self.create_oval(125 + int(math.cos(math.radians(self.angulo-90)) * 100),
+                                    125 + int(math.sin(math.radians(self.angulo-90)) * 100),
+                                    int(math.cos(math.radians(self.angulo-90)) * (100 + 1)) + 125,
+                                    int(math.sin(math.radians(self.angulo-90)) * (100 + 1)) + 125,
+                                    fill='black', width=4)
+            self.angulo += 30
         self.atualizar()
 
-    def coordenadas(self, x1, y1, x2, y2):
-        X = 175 * x1 + 200
-        Y = 175 * -y1 + 200
-        X1 = 175 * x2 + 200
-        Y1 = 175 * -y2 + 200
-        return (X, Y), (X1, Y1)
-
-    def desenha_relogio(self):
-        ini = pi / 2
-        passo = pi / 6
-        for i in range(12):
-            angulo = ini - i * passo
-            x, y = cos(angulo), sin(angulo)
-            self.cria_circulos(x, y)
-        self.desenha_ponteiros()
-        self.cria_circulos(0, 0)
-
-    def desenha_ponteiros(self):
-        self.canvas.delete('ponteiro')
-        horas = datetime.timetuple(datetime.now())
-        h, m, s = horas[3], horas[4], horas[5]
-        angulo = pi / 2 - pi / 6 * (h + m / 60.0)
-        x, y = cos(angulo) * 0.70, sin(angulo) * 0.70
-        ponteiro = self.canvas.create_line
-        ponteiro(self.coordenadas(0, 0, x, y), tag='ponteiro', fill="#ffffff", width=25 / 3)
-        angulo = pi / 2 - pi / 30 * (m + s / 60.0)
-        x, y = cos(angulo) * 0.90, sin(angulo) * 0.90
-        ponteiro(self.coordenadas(0, 0, x, y), tag='ponteiro', fill="#ffffff", width=25 / 5)
-        angulo = pi / 2 - pi / 30 * s
-        x, y = cos(angulo) * 0.95, sin(angulo) * 0.95
-        ponteiro(self.coordenadas(0, 0, x, y), tag='ponteiro', fill="#ffffff", arrow='last')
-
-    def cria_circulos(self, x, y):
-        self.canvas.create_oval(self.coordenadas(-0.045 + x, -0.045 + y, 0.045 + x, 0.045 + y), fill="#808080")
+    def funcao(self): self.atualizar()
 
     def atualizar(self):
-        self.desenha_relogio()
-        self.root.after(100, self.atualizar)
+        if not self.min:
+            self.min =self.create_line(0,0,0,0,fill="brown",width=2)
+        if not self.hr:
+            self.hr =self.create_line(0,0,0,0,fill="darkgreen",width=3)
+        if not self.seg:
+            self.seg =self.create_line(0,0,0,0,fill="black",width=1)
+        hora = ((datetime.datetime.now().hour * 30.0) + (30.0 * (datetime.datetime.now().minute / 60.0)))
+        minuto = ((datetime.datetime.now().minute * 6.0) + (6.0 * (datetime.datetime.now().second / 60.0)))
+        segundo = (datetime.datetime.now().second * 6)
+        self.create_oval(4, 4, 246, 246, width=2, outline='black')
+        self.coords(self.hr, 120, 120,
+                         int(math.cos(math.radians(hora - 90)) * 50) + 120,
+                         int(math.sin(math.radians(hora - 90)) * 50) + 120)
+        self.coords(self.min, 120, 120,
+                         int(math.cos(math.radians(minuto - 90)) * 70) + 120,
+                         int(math.sin(math.radians(minuto - 90)) * 70) + 120)
+        self.coords(self.seg, 120, 120,
+                         int(math.cos(math.radians(segundo - 90)) * 95) + 120,
+                         int(math.sin(math.radians(segundo - 90)) * 95) + 120)
+        self.after(100, self.funcao)
 
 
-relogio = Tk()
-relogioAnalogico(relogio)
-relogio.title("Relogio")
-relogio.mainloop()
+principal = tkinter.Tk()
+principal.geometry("250x250")
+principal.title(".::Relogio::.")
+relogio = relogioAnalogico(principal)
+relogio.pack()
+principal.mainloop()
+
